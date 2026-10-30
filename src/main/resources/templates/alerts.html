@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Alerts — RestockRadar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar('alerts')}"></div>
+
+    <div class="main">
+        <div th:replace="~{fragments/flash :: flash}"></div>
+
+        <div class="page-header">
+            <div>
+                <div class="page-eyebrow">Operations</div>
+                <h1>Stock Alerts</h1>
+                <p class="subtitle">Low-stock and overstock alerts, raised automatically as stock changes.</p>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div th:if="${#lists.isEmpty(alerts)}" class="empty-state">
+                <div class="empty-icon">🔔</div>
+                <p><strong>No alerts yet.</strong><br>Alerts will appear here automatically when a product runs low or gets overstocked.</p>
+            </div>
+
+            <table th:if="${not #lists.isEmpty(alerts)}">
+                <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Type</th>
+                    <th>Message</th>
+                    <th>Raised</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="a : ${alerts}">
+                    <td><strong th:text="${a.product.productName}">Product</strong></td>
+                    <td>
+                        <span class="badge" th:classappend="${a.alertType.name() == 'Low'} ? 'badge-low' : 'badge-overstock'" th:text="${a.alertType}">Low</span>
+                    </td>
+                    <td class="muted" th:text="${a.alertMessage}">Message</td>
+                    <td class="muted" th:text="${#temporals.format(a.alertDate, 'dd MMM yyyy, hh:mm a')}">Date</td>
+                    <td>
+                        <span class="badge" th:classappend="${a.status.name() == 'Active'} ? 'badge-amber' : 'badge-neutral'" th:text="${a.status}">Active</span>
+                    </td>
+                    <td style="text-align:right;">
+                        <form th:if="${a.status.name() == 'Active'}" th:action="@{/alerts/{id}/resolve(id=${a.alertId})}" method="post">
+                            <button type="submit" class="btn btn-outline btn-sm">Mark resolved</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

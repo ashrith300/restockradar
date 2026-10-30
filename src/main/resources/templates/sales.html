@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Sales — RestockRadar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar('sales')}"></div>
+
+    <div class="main">
+        <div th:replace="~{fragments/flash :: flash}"></div>
+
+        <div class="page-header">
+            <div>
+                <div class="page-eyebrow">Operations</div>
+                <h1>Daily Sales</h1>
+                <p class="subtitle">Log what you sold today — stock and reorder math update automatically.</p>
+            </div>
+        </div>
+
+        <div class="form-card" style="margin-bottom:22px; max-width:100%;">
+            <form th:action="@{/sales/new}" th:object="${saleForm}" method="post">
+                <div class="form-grid-2">
+                    <div class="form-row">
+                        <label for="productId">Product</label>
+                        <select id="productId" th:field="*{productId}">
+                            <option value="">— Select a product —</option>
+                            <option th:each="p : ${products}" th:value="${p.productId}"
+                                    th:text="${p.productName + ' (in stock: ' + p.currentStock + ')'}">Product</option>
+                        </select>
+                        <div class="field-error" th:if="${#fields.hasErrors('productId')}" th:errors="*{productId}"></div>
+                    </div>
+                    <div class="form-row">
+                        <label for="quantitySold">Quantity sold</label>
+                        <input type="number" min="1" id="quantitySold" th:field="*{quantitySold}" placeholder="e.g. 3">
+                        <div class="field-error" th:if="${#fields.hasErrors('quantitySold')}" th:errors="*{quantitySold}"></div>
+                    </div>
+                </div>
+                <div class="form-actions" style="margin-top:6px;">
+                    <button type="submit" class="btn btn-accent">Log sale</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header"><h3>Recent sales</h3></div>
+
+            <div th:if="${#lists.isEmpty(sales)}" class="empty-state">
+                <div class="empty-icon">🧾</div>
+                <p><strong>No sales logged yet.</strong><br>Log your first sale above.</p>
+            </div>
+
+            <table th:if="${not #lists.isEmpty(sales)}">
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Product</th>
+                    <th>Qty Sold</th>
+                    <th>Selling Price</th>
+                    <th>Total</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${sales}">
+                    <td class="muted" th:text="${#temporals.format(s.saleDate, 'dd MMM yyyy, hh:mm a')}">Date</td>
+                    <td><strong th:text="${s.product.productName}">Product</strong></td>
+                    <td class="mono" th:text="${s.quantitySold}">0</td>
+                    <td class="mono">₹<span th:text="${s.sellingPrice}">0.00</span></td>
+                    <td class="mono">₹<span th:text="${s.totalAmount}">0.00</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

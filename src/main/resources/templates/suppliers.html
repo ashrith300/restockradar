@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suppliers — RestockRadar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar('suppliers')}"></div>
+
+    <div class="main">
+        <div th:replace="~{fragments/flash :: flash}"></div>
+
+        <div class="page-header">
+            <div>
+                <div class="page-eyebrow">Catalog</div>
+                <h1>Suppliers</h1>
+                <p class="subtitle">Manage the distributors, wholesalers, and farms providing your inventory.</p>
+            </div>
+        </div>
+
+        <div class="form-card" style="margin-bottom:22px; max-width:100%;">
+            <form th:action="@{/suppliers/new}" th:object="${supplierForm}" method="post">
+                <div class="form-grid-2">
+                    <div class="form-row">
+                        <label for="supplierName">Supplier name</label>
+                        <input type="text" id="supplierName" th:field="*{supplierName}" placeholder="e.g. Apex Wholesale Corp" required>
+                        <div class="field-error" th:if="${#fields.hasErrors('supplierName')}" th:errors="*{supplierName}"></div>
+                    </div>
+                    <div class="form-row">
+                        <label for="contactName">Contact person</label>
+                        <input type="text" id="contactName" th:field="*{contactName}" placeholder="Full name">
+                    </div>
+                </div>
+
+                <div class="form-grid-2">
+                    <div class="form-row">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" th:field="*{email}" placeholder="contact@supplier.com">
+                    </div>
+                    <div class="form-row">
+                        <label for="phone">Phone number</label>
+                        <input type="text" id="phone" th:field="*{phone}" placeholder="+91-XXXXX-XXXXX">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="address">Address</label>
+                    <input type="text" id="address" th:field="*{address}" placeholder="Full street address and city">
+                </div>
+
+                <div class="form-actions" style="margin-top:6px;">
+                    <button type="submit" class="btn btn-accent">+ Add supplier</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel">
+            <div th:if="${#lists.isEmpty(suppliers)}" class="empty-state">
+                <div class="empty-icon">🤝</div>
+                <p><strong>No suppliers yet.</strong><br>Add your first supplier above to link them to your products.</p>
+            </div>
+
+            <table th:if="${not #lists.isEmpty(suppliers)}">
+                <thead>
+                <tr>
+                    <th>Supplier</th>
+                    <th>Contact Person</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="s : ${suppliers}">
+                    <td><strong th:text="${s.supplierName}">Supplier</strong></td>
+                    <td th:text="${s.contactName ?: '—'}">—</td>
+                    <td class="mono" th:text="${s.email ?: '—'}">—</td>
+                    <td class="mono" th:text="${s.phone ?: '—'}">—</td>
+                    <td class="muted" th:text="${s.address ?: '—'}">—</td>
+                    <td style="text-align:right; white-space:nowrap;">
+                        <a th:if="${s.phone != null and !#strings.isEmpty(s.phone)}"
+                           th:href="@{https://api.whatsapp.com/send(phone=${#strings.replace(#strings.replace(#strings.replace(s.phone, '+', ''), '-', ''), ' ', '')}, text=${'Hello ' + s.supplierName + ', this is ' + shopName + '. We would like to inquire about medicine stock and orders. Thank you!'})}"
+                           target="_blank"
+                           class="btn btn-whatsapp btn-sm"
+                           title="Chat on WhatsApp">
+                            💬 WhatsApp
+                        </a>
+                        <form th:action="@{/suppliers/{id}/delete(id=${s.supplierId})}" method="post" style="display:inline;" onsubmit="return confirm('Delete this supplier?');">
+                            <button type="submit" class="btn-danger-text btn-sm" style="border:none; background:none; cursor:pointer;">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

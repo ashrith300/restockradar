@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reorder Recommendations — RestockRadar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+    <div class="app-shell">
+        <div th:replace="~{fragments/sidebar :: sidebar('reorders')}"></div>
+
+        <div class="main">
+            <div th:replace="~{fragments/flash :: flash}"></div>
+
+            <div class="page-header">
+                <div>
+                    <div class="page-eyebrow">Operations</div>
+                    <h1>Reorder Recommendations</h1>
+                    <p class="subtitle">Average daily sales vs. current stock — what to order, how much, and by when.
+                    </p>
+                </div>
+                <form th:action="@{/reorders/generate}" method="post">
+                    <button type="submit" class="btn btn-accent">↻ Refresh recommendations</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <div th:if="${#lists.isEmpty(recommendations)}" class="empty-state">
+                    <div class="empty-icon">📈</div>
+                    <p><strong>No recommendations yet.</strong><br>Click "Refresh recommendations" to run the reorder
+                        engine across all your products.</p>
+                </div>
+
+                <table th:if="${not #lists.isEmpty(recommendations)}">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Supplier</th>
+                            <th>Avg. Daily Sales</th>
+                            <th>Days to Stockout</th>
+                            <th>Suggested Qty</th>
+                            <th>Reorder By</th>
+                            <th>Status</th>
+                            <th style="text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${recommendations}">
+                            <td><strong th:text="${r.product.productName}">Product</strong></td>
+                            <td class="muted"
+                                th:text="${r.product.supplier != null ? r.product.supplier.supplierName : '—'}">—</td>
+                            <td class="mono" th:text="${r.averageDailySales}">0.00</td>
+                            <td class="mono"
+                                th:text="${r.daysToStockout != null ? r.daysToStockout + ' days' : 'No sales data'}">—
+                            </td>
+                            <td class="mono"><strong th:text="${r.suggestedQuantity}">0</strong></td>
+                            <td class="mono"
+                                th:text="${r.reorderDate != null ? #temporals.format(r.reorderDate, 'dd MMM yyyy') : '—'}">
+                                —</td>
+                            <td>
+                                <span class="badge"
+                                    th:classappend="${r.recommendationStatus.name() == 'Pending'} ? 'badge-amber' : 'badge-healthy'"
+                                    th:text="${r.recommendationStatus}">Pending</span>
+                            </td>
+                            <td style="text-align:right; white-space:nowrap;">
+                                <a th:if="${r.product.supplier != null and r.product.supplier.phone != null}"
+                                    th:href="@{https://api.whatsapp.com/send(phone=${#strings.replace(#strings.replace(#strings.replace(r.product.supplier.phone, '+', ''), '-', ''), ' ', '')}, text=${'Hello ' + r.product.supplier.supplierName + ', this is ' + shopName + '. We would like to place an order for ' + r.suggestedQuantity + ' units of ' + r.product.productName + '. Please confirm dispatch and expected delivery date. Thank you!'})}"
+                                    target="_blank" class="btn btn-whatsapp btn-sm"
+                                    title="Send purchase order via WhatsApp">
+                                    💬 WhatsApp Order
+                                </a>
+                                <a th:href="@{/intake(productId=${r.product.productId})}" class="btn btn-outline btn-sm"
+                                    title="Log shipment receipt">
+                                    📥 Receive Stock
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="text-sm muted">
+                Recommendations refresh automatically each night, and instantly whenever you log a new sale.
+                The math: average daily sales over the last 30 days → days left before you run out → enough stock for 14
+                days, ordered ~3 days before you'd run out.
+            </p>
+        </div>
+    </div>
+
+</body>
+
+</html>

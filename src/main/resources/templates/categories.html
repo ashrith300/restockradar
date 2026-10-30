@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories — RestockRadar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar('categories')}"></div>
+
+    <div class="main">
+        <div th:replace="~{fragments/flash :: flash}"></div>
+
+        <div class="page-header">
+            <div>
+                <div class="page-eyebrow">Catalog</div>
+                <h1>Categories</h1>
+                <p class="subtitle">Group products so trends and reports are easier to read.</p>
+            </div>
+        </div>
+
+        <div class="form-card" style="margin-bottom:22px; max-width:100%;">
+            <form th:action="@{/categories/new}" th:object="${categoryForm}" method="post">
+                <div class="form-grid-2">
+                    <div class="form-row">
+                        <label for="categoryName">Category name</label>
+                        <input type="text" id="categoryName" th:field="*{categoryName}" placeholder="e.g. Snacks">
+                        <div class="field-error" th:if="${#fields.hasErrors('categoryName')}" th:errors="*{categoryName}"></div>
+                    </div>
+                    <div class="form-row">
+                        <label for="description">Description (optional)</label>
+                        <input type="text" id="description" th:field="*{description}" placeholder="Short note">
+                    </div>
+                </div>
+                <div class="form-actions" style="margin-top:6px;">
+                    <button type="submit" class="btn btn-accent">+ Add category</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel">
+            <div th:if="${#lists.isEmpty(categories)}" class="empty-state">
+                <div class="empty-icon">🏷️</div>
+                <p><strong>No categories yet.</strong><br>Add one above to start organizing your products.</p>
+            </div>
+
+            <table th:if="${not #lists.isEmpty(categories)}">
+                <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="c : ${categories}">
+                    <td><strong th:text="${c.categoryName}">Category</strong></td>
+                    <td class="muted" th:text="${c.description ?: '—'}">—</td>
+                    <td style="text-align:right;">
+                        <form th:action="@{/categories/{id}/delete(id=${c.categoryId})}" method="post" style="display:inline;" onsubmit="return confirm('Delete this category?');">
+                            <button type="submit" class="btn-danger-text btn-sm" style="border:none; background:none; cursor:pointer;">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

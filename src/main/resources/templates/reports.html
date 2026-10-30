@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports — RestockRadar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar('reports')}"></div>
+
+    <div class="main">
+        <div th:replace="~{fragments/flash :: flash}"></div>
+
+        <div class="page-header">
+            <div>
+                <div class="page-eyebrow">Insights</div>
+                <h1>Reports</h1>
+                <p class="subtitle">Revenue by product, top sellers, and dead stock — generated on demand.</p>
+            </div>
+            <form th:action="@{/reports/generate}" method="post">
+                <button type="submit" class="btn btn-accent">↻ Generate report</button>
+            </form>
+        </div>
+
+        <div class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
+            <div class="stat-card">
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value">₹<span th:text="${totalRevenue}">0.00</span></div>
+            </div>
+            <div class="stat-card healthy">
+                <div class="stat-label">Top Sellers</div>
+                <div class="stat-value" th:text="${#lists.size(reports.?[topSelling == true])}">0</div>
+            </div>
+            <div class="stat-card low">
+                <div class="stat-label">Dead Stock Items</div>
+                <div class="stat-value" th:text="${#lists.size(reports.?[deadStock == true])}">0</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div th:if="${#lists.isEmpty(reports)}" class="empty-state">
+                <div class="empty-icon">📊</div>
+                <p><strong>No report generated yet.</strong><br>Click "Generate report" to analyze revenue and sales trends across your products.</p>
+            </div>
+
+            <table th:if="${not #lists.isEmpty(reports)}">
+                <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Revenue</th>
+                    <th>Top Seller</th>
+                    <th>Dead Stock</th>
+                    <th>Generated</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${reports}">
+                    <td><strong th:text="${r.product.productName}">Product</strong></td>
+                    <td class="mono">₹<span th:text="${r.revenue}">0.00</span></td>
+                    <td>
+                        <span th:if="${r.topSelling}" class="badge badge-healthy">Top seller</span>
+                        <span th:unless="${r.topSelling}" class="muted">—</span>
+                    </td>
+                    <td>
+                        <span th:if="${r.deadStock}" class="badge badge-low">Dead stock</span>
+                        <span th:unless="${r.deadStock}" class="muted">—</span>
+                    </td>
+                    <td class="muted" th:text="${#temporals.format(r.generatedOn, 'dd MMM yyyy, hh:mm a')}">Date</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="text-sm muted">
+            "Dead stock" = no sales recorded in the last 30 days. "Top seller" = highest total revenue among your products.
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

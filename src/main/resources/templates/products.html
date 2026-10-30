@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products — RestockRadar</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar('products')}"></div>
+
+    <div class="main">
+        <div th:replace="~{fragments/flash :: flash}"></div>
+
+        <div class="page-header">
+            <div>
+                <div class="page-eyebrow">Catalog</div>
+                <h1>Products</h1>
+                <p class="subtitle">One-time setup — add each product's cost, price, and stock levels.</p>
+            </div>
+            <a th:href="@{/products/new}" class="btn btn-accent">+ Add product</a>
+        </div>
+
+        <div class="panel">
+            <div th:if="${#lists.isEmpty(products)}" class="empty-state">
+                <div class="empty-icon">📦</div>
+                <p><strong>No products yet.</strong><br>Add your first product to get started.</p>
+                <a th:href="@{/products/new}" class="btn btn-accent" style="margin-top:10px;">+ Add your first product</a>
+            </div>
+
+            <table th:if="${not #lists.isEmpty(products)}">
+                <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Supplier</th>
+                    <th>Batch #</th>
+                    <th>Cost Price</th>
+                    <th>Selling Price</th>
+                    <th>Current Stock</th>
+                    <th>Min. Stock</th>
+                    <th>Expiry Date</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${products}">
+                    <td><strong th:text="${p.productName}">Product</strong></td>
+                    <td class="muted" th:text="${p.category != null ? p.category.categoryName : '—'}">—</td>
+                    <td class="muted" th:text="${p.supplier != null ? p.supplier.supplierName : '—'}">—</td>
+                    <td class="mono muted" th:text="${p.batchNumber != null ? p.batchNumber : '—'}">—</td>
+                    <td class="mono">₹<span th:text="${p.costPrice}">0.00</span></td>
+                    <td class="mono">₹<span th:text="${p.sellingPrice}">0.00</span></td>
+                    <td class="mono" th:text="${p.currentStock}">0</td>
+                    <td class="mono muted" th:text="${p.minimumStock}">0</td>
+                    <td>
+                        <span th:if="${p.expiryDate == null}" class="muted">—</span>
+                        <span th:if="${p.expiryDate != null and p.isExpired()}" class="badge badge-low" th:title="${#temporals.format(p.expiryDate, 'dd MMM yyyy')}">
+                            ⚠️ Expired (<span th:text="${#temporals.format(p.expiryDate, 'dd MMM')}">date</span>)
+                        </span>
+                        <span th:if="${p.expiryDate != null and p.isExpiringSoon()}" class="badge badge-amber" th:title="${#temporals.format(p.expiryDate, 'dd MMM yyyy')}">
+                            ⏳ <span th:text="${p.getDaysUntilExpiry() + ' days left'}">12 days left</span>
+                        </span>
+                        <span th:if="${p.expiryDate != null and !p.isExpired() and !p.isExpiringSoon()}" class="mono muted" th:text="${#temporals.format(p.expiryDate, 'dd MMM yyyy')}">
+                            01 Jan 2027
+                        </span>
+                    </td>
+                    <td style="text-align:right; white-space:nowrap;">
+                        <a th:href="@{/intake(productId=${p.productId})}" class="btn btn-outline btn-sm" title="Receive incoming stock">📥 Receive</a>
+                        <a th:if="${p.supplier != null and p.supplier.phone != null}"
+                           th:href="@{https://api.whatsapp.com/send(phone=${#strings.replace(#strings.replace(#strings.replace(p.supplier.phone, '+', ''), '-', ''), ' ', '')}, text=${'Hello ' + p.supplier.supplierName + ', this is ' + shopName + '. We are inquiring about ' + p.productName + '. Thank you!'})}"
+                           target="_blank"
+                           class="btn btn-whatsapp btn-sm"
+                           title="Contact supplier via WhatsApp">
+                            💬
+                        </a>
+                        <a th:href="@{/products/{id}/edit(id=${p.productId})}" class="btn btn-outline btn-sm">Edit</a>
+                        <form th:action="@{/products/{id}/delete(id=${p.productId})}" method="post" style="display:inline;" onsubmit="return confirm('Delete this product? This cannot be undone.');">
+                            <button type="submit" class="btn-danger-text btn-sm" style="border:none; background:none; cursor:pointer;">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

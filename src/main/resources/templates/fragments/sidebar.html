@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="sidebar(active)" class="sidebar">
+    <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="20" cy="20" r="19" stroke="#6FE3B4" stroke-width="1.4" opacity="0.35"/>
+            <circle cx="20" cy="20" r="13" stroke="#6FE3B4" stroke-width="1.4" opacity="0.55"/>
+            <circle cx="20" cy="20" r="7" stroke="#6FE3B4" stroke-width="1.4" opacity="0.85"/>
+            <circle cx="20" cy="20" r="2.4" fill="#6FE3B4"/>
+        </svg>
+        <div>
+            <div class="brand-name">RestockRadar</div>
+            <div class="brand-sub">Stock Console</div>
+        </div>
+    </div>
+
+    <div class="nav-section-label">Overview</div>
+    <a th:href="@{/dashboard}" class="nav-link" th:classappend="${active == 'dashboard'} ? 'active'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+    </a>
+
+    <div class="nav-section-label">Catalog</div>
+    <a th:href="@{/products}" class="nav-link" th:classappend="${active == 'products'} ? 'active'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/></svg>
+        Products
+    </a>
+    <a th:href="@{/categories}" class="nav-link" th:classappend="${active == 'categories'} ? 'active'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v4H4z"/><path d="M4 12h16v8H4z"/></svg>
+        Categories
+    </a>
+    <a th:href="@{/suppliers}" class="nav-link" th:classappend="${active == 'suppliers'} ? 'active'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Suppliers
+    </a>
+
+    <div class="nav-section-label">Operations</div>
+    <a th:href="@{/intake}" class="nav-link" th:classappend="${active == 'intake'} ? 'active'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
+        Stock Intake
+    </a>
+    <a th:href="@{/sales}" class="nav-link" th:classappend="${active == 'sales'} ? 'active'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L22 7H6"/></svg>
+        Daily Sales
+    </a>
+    <a th:href="@{/reorders}" class="nav-link" th:classappend="${active == 'reorders'} ? 'active'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+        Reorders
+    </a>
+    <a th:href="@{/alerts}" class="nav-link" th:classappend="${active == 'alerts'} ? 'active'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a6 6 0 0 0-6 6v4l-2 4h16l-2-4V8a6 6 0 0 0-6-6z"/><path d="M9.5 19a2.5 2.5 0 0 0 5 0"/></svg>
+        Alerts
+        <span class="nav-badge" th:if="${activeAlertCount != null and activeAlertCount > 0}" th:text="${activeAlertCount}">3</span>
+    </a>
+    <a th:href="@{/reports}" class="nav-link" th:classappend="${active == 'reports'} ? 'active'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 15l4-6 3 3 5-7"/></svg>
+        Reports
+    </a>
+    <a th:href="@{/profile}" class="nav-link" th:classappend="${active == 'profile'} ? 'active'">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        My Profile
+    </a>
+
+    <div class="sidebar-footer">
+        <div class="shop-chip">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7FA0C4" stroke-width="2"><path d="M3 9l1-5h16l1 5"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/></svg>
+            <div>
+                <strong th:text="${shopName}">Shop</strong>
+                <span>Owner console</span>
+            </div>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="logout-btn">Sign out</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

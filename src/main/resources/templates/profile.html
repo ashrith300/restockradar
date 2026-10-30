@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile — RestockRadar</title>
+    <link class="stylesheet" th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+
+<div class="app-shell">
+    <div th:replace="~{fragments/sidebar :: sidebar('profile')}"></div>
+
+    <div class="main">
+        <div th:replace="~{fragments/flash :: flash}"></div>
+
+        <div class="page-header">
+            <div>
+                <div class="page-eyebrow">Settings</div>
+                <h1>My Profile</h1>
+                <p class="subtitle">View and update your shop details and owner contact settings.</p>
+            </div>
+        </div>
+
+        <div class="form-card" style="max-width:600px;">
+            <form th:action="@{/profile}" method="post">
+                <div class="form-row">
+                    <label for="shopName">Shop name</label>
+                    <input type="text" id="shopName" name="shopName" th:value="${user.shopName}" required>
+                </div>
+                
+                <div class="form-row">
+                    <label for="ownerName">Owner name</label>
+                    <input type="text" id="ownerName" name="ownerName" th:value="${user.ownerName}" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="email">Email address</label>
+                    <input type="email" id="email" name="email" th:value="${user.email}" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="phone">Phone number</label>
+                    <input type="text" id="phone" name="phone" th:value="${user.phone}">
+                </div>
+
+                <div class="form-actions" style="margin-top:12px;">
+                    <button type="submit" class="btn btn-accent">Save profile changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
